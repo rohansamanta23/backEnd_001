@@ -1,14 +1,9 @@
-const asyncHandler = (fn) => async(req,res,next) =>{
-    try{
-        await fn(req,res,next)
+const asyncHandler = (fn) => async (req, res, next) => {
+    try {
+        await fn(req, res, next);
+    } catch (err) {
+        next(err); // Pass the error to the centralized error handler
     }
-    catch(err){
-        res.status(500).json({
-            message: "Something went wrong",
-            error: err.message
-        })
-        next(err)
-    }
-}
+};
 
-export {asyncHandler};
+export { asyncHandler };
