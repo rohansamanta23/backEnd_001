@@ -7,11 +7,10 @@ import { ApiReasponse } from "../utils/ApiResponse.js";
 //access and refresh token generation method
 const genAccessAndRefreshToken = async (userId) => {
     try {
-        const user = await User.findById(userId).then(async (user) => {
-            if (!user) {
-                throw new ApiError(404, "User not found");
-            }
-        });
+        const user = await User.findById(userId)
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
         const accessToken = user.generateAccessToken();
         const refreshToken = user.generateRefreshToken();
         //save refresh token in db
@@ -95,20 +94,22 @@ const loginUser = asyncHandler(async (req, res) => {
     if(!password){
         throw new ApiError(400,"Please enter password")
     }
-    if(email.includes("@")===false){
-        throw new ApiError(400,"Please enter a valid email")
-    }
+    // if(!email){
+    //     if(email.includes("@")===false){
+    //         throw new ApiError(400,"Please enter a valid email")
+    // }}
     //find the user by username or email
-    const user = User.findOne({
+    const user = await User.findOne({
         $or: [{username},{email}]
-    }).then(async (user)=>{
-        if(!user){
-            throw new ApiError(404,"User not found")
-        }
     })
+    console.log(user);
+    
+    if(!user){
+        throw new ApiError(404,"User not found")
+    }
     //check password
-    const isPasswordCorrect = await user.isPasswordCorrect(password)
-    if(!isPasswordCorrect){
+    const passwordCorrect = await user.isPasswordCorrect(password)
+    if(!passwordCorrect){
         throw new ApiError(401,"Invalid password")
     }
     //generate access token and refresh token
@@ -135,7 +136,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(req.user._id, {
         refreshToken: undefined,
     });
-    options = {
+    const options = {
         httpOnly: true,
         secure: true,
     };
