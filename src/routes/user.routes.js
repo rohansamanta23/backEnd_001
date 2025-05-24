@@ -5,6 +5,8 @@ import {
   logoutUser,
   refreshAccessToken,
   changeCurrentPassword,
+  getUserChannelProfile,
+  watchHistory,
 } from "../controllers/user.controller.js";
 import {
   getCurrentUser,
@@ -37,14 +39,18 @@ router
 
 router.route("/me").get(verifyJWT, getCurrentUser);
 
-router.route("/update").put(verifyJWT, upload.none(), updateAccountDetails);  
+router.route("/update").patch(verifyJWT, upload.none(), updateAccountDetails);
 
 router
   .route("/update-avatar")
-  .put(verifyJWT, upload.single("avatar"), updateUserAvatar);
+  .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 
 router
   .route("/update-cover-image")
-  .put(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
+  .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
+
+router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
+
+router.route("/history").get(verifyJWT, watchHistory);
 
 export default router;
